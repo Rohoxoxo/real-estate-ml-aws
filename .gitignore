@@ -1,18 +1,23 @@
-# Python
+# 1) Update .gitignore (append these lines safely)
+cat >> .gitignore << 'EOF'
+
+# Jupyter / Python
+.ipynb_checkpoints/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.ipynb_checkpoints/
 
-# Virtual environments
+# Environments
 .venv/
 venv/
 
-# OS / editor
+# OS files
 .DS_Store
-.vscode/
 
-# Artifacts
-*.log
-*.tmp
+# Large / generated artifacts
+*.pkl
+*.joblib
+EOF
+
+.venv/
+venv/
+
