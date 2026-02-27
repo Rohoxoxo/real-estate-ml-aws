@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Real Estate Price Prediction - Inference API (B1)
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 10
+    MemorySize: 512
+    Tracing: Active
+Resources:
+  InferenceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: InferenceFunction
+      Handler: app.lambda_handler
+      Events:
+        PredictApi:
+          Type: Api
+          Properties:
+            Path: /predict
+            Method: post
+    Metadata:
+      SamResourceId: InferenceFunction

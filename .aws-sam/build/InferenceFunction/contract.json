@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "required": [
+      "area_type",
+      "location",
+      "total_sqft",
+      "bath",
+      "balcony",
+      "BHK"
+    ],
+    "properties": {
+      "area_type": { "type": "string" },
+      "location": { "type": "string" },
+      "total_sqft": { 
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "bath": { 
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "balcony": { 
+        "type": "number",
+        "minimum": 0
+      },
+      "BHK": { 
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    }
+  }
