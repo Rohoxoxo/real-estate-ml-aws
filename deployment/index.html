@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bengaluru House Price Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060910;
+      --surface: #0d1117;
+      --surface2: #141b24;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.15);
+      --accent: #00d4aa;
+      --accent2: #0099ff;
+      --accent-glow: rgba(0,212,170,0.15);
+      --text: #e8edf3;
+      --text-muted: #6b7a8d;
+      --text-dim: #3d4a57;
+      --danger: #ff4f4f;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-mesh::before {
+      content: '';
+      position: absolute;
+      width: 800px; height: 800px;
+      top: -200px; left: -200px;
+      background: radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 70%);
+      animation: drift1 18s ease-in-out infinite alternate;
+    }
+
+    .bg-mesh::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      bottom: -100px; right: -100px;
+      background: radial-gradient(circle, rgba(0,153,255,0.07) 0%, transparent 70%);
+      animation: drift2 22s ease-in-out infinite alternate;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+    }
+
+    @keyframes drift1 {
+      from { transform: translate(0,0) scale(1); }
+      to { transform: translate(80px,60px) scale(1.15); }
+    }
+    @keyframes drift2 {
+      from { transform: translate(0,0) scale(1); }
+      to { transform: translate(-60px,-40px) scale(1.1); }
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 80px 24px 100px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border: 1px solid rgba(0,212,170,0.3);
+      border-radius: 100px;
+      background: rgba(0,212,170,0.06);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(38px, 6.5vw, 68px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 20px;
+      animation: fadeDown 0.6s 0.1s ease both;
+    }
+
+    h1 .accent-word {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 460px;
+      margin: 0 auto;
+      animation: fadeDown 0.6s 0.2s ease both;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 36px;
+      animation: fadeDown 0.6s 0.3s ease both;
+    }
+
+    .stat { text-align: center; }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.7s 0.35s ease both;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.6;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a8d' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+
+    select option { background: #1a2332; }
+
+    select:focus, input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #0d1a16;
+      box-shadow: 0 0 0 3px rgba(0,212,170,0.1), 0 0 20px rgba(0,212,170,0.05);
+    }
+
+    select:hover, input[type="number"]:hover {
+      border-color: var(--border-hover);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button { opacity: 0.3; }
+
+    .input-wrap { position: relative; }
+
+    .input-unit {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--text-dim);
+      pointer-events: none;
+      font-weight: 500;
+    }
+
+    .input-wrap input { padding-right: 52px; }
+
+    .btn {
+      grid-column: 1 / -1;
+      margin-top: 12px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--accent), #00b894);
+      color: #020f0b;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,212,170,0.35), 0 2px 8px rgba(0,212,170,0.2);
+    }
+
+    .btn:hover::before { opacity: 1; }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(2,15,11,0.3);
+      border-top-color: #020f0b;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result {
+      margin-top: 28px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: none;
+      animation: resultReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .result.visible { display: block; }
+
+    @keyframes resultReveal {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .result-inner {
+      background: linear-gradient(135deg, #041a14 0%, #051820 100%);
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 12px;
+      padding: 32px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-inner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .result-inner::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .result.error .result-inner {
+      background: linear-gradient(135deg, #1a0505 0%, #150a08 100%);
+      border-color: rgba(255,79,79,0.2);
+    }
+
+    .result.error .result-inner::before {
+      background: linear-gradient(90deg, var(--danger), #ff8f4f);
+    }
+
+    .result-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-label::before {
+      content: '';
+      width: 16px; height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    .result.error .result-label { color: var(--danger); }
+    .result.error .result-label::before { background: var(--danger); }
+
+    /* --- UPDATED RESULT LAYOUT (Lakhs ≈ USD side-by-side) --- */
+    .result-prices {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .result-price-divider {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--text-dim);
+      line-height: 1;
+    }
+
+    .result-price {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(44px, 9vw, 76px);
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .result-price-usd {
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent2)) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+    }
+    /* --- END UPDATED RESULT LAYOUT --- */
+
+    .result-unit {
+      font-size: 18px;
+      font-weight: 400;
+      font-family: 'Instrument Sans', sans-serif;
+      -webkit-text-fill-color: rgba(232,237,243,0.5);
+      margin-left: 4px;
+    }
+
+    .result-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .result-tag {
+      padding: 3px 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      font-size: 14px;
+      color: #ff8080;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 52px;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+
+    .footer-chips {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      font-size: 11px;
+      color: var(--text-dim);
+      padding: 0 14px;
+      border-right: 1px solid var(--border);
+      line-height: 1;
+    }
+
+    .chip:last-child { border-right: none; }
+    .chip a { color: var(--accent); text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }
+    .chip a:hover { opacity: 1; }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .page-wrap { padding: 48px 16px 72px; }
+      .card { padding: 28px 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: 1; }
+      .btn { grid-column: 1; }
+      .stats-row { gap: 24px; }
+      .result-inner { padding: 24px 20px; }
+      .result-price-divider { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-mesh"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-wrap">
+
+    <header>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        ML-Powered · Live
+      </div>
+      <h1>Bengaluru<br/><span class="accent-word">House Price</span><br/>Predictor</h1>
+      <p class="subtitle">Enter property details to get an instant price estimate powered by a gradient boosting model trained on real Bengaluru housing data.</p>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-value">13K+</div>
+          <div class="stat-label">Properties</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-value">247</div>
+          <div class="stat-label">Features</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-value">HGB</div>
+          <div class="stat-label">Model</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-value">AWS</div>
+          <div class="stat-label">Deployed</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="section-label">Property Details</div>
+
+      <div class="form-grid">
+
+        <div class="field full">
+          <label for="area_type">Area Type</label>
+          <select id="area_type">
+            <option value="Super built-up  Area">Super Built-up Area</option>
+            <option value="Built-up  Area">Built-up Area</option>
+            <option value="Plot  Area">Plot Area</option>
+            <option value="Carpet  Area">Carpet Area</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="location">Location</label>
+          <select id="location">
+                <option value="7th Phase JP Nagar">7th Phase JP Nagar</option>
+                <option value="Banashankari">Banashankari</option>
+                <option value="Bannerghatta Road">Bannerghatta Road</option>
+                <option value="Begur Road">Begur Road</option>
+                <option value="Bellandur">Bellandur</option>
+                <option value="Chandapura">Chandapura</option>
+                <option value="Electronic City">Electronic City</option>
+                <option value="Electronic City Phase II">Electronic City Phase II</option>
+                <option value="Electronics City Phase 1">Electronics City Phase 1</option>
+                <option value="Haralur Road">Haralur Road</option>
+                <option value="Harlur">Harlur</option>
+                <option value="Hebbal">Hebbal</option>
+                <option value="Hennur Road">Hennur Road</option>
+                <option value="Hoodi">Hoodi</option>
+                <option value="Hormavu">Hormavu</option>
+                <option value="KR Puram">KR Puram</option>
+                <option value="Kanakpura Road">Kanakpura Road</option>
+                <option value="Kasavanhalli">Kasavanhalli</option>
+                <option value="Kengeri">Kengeri</option>
+                <option value="Marathahalli">Marathahalli</option>
+                <option value="Raja Rajeshwari Nagar">Raja Rajeshwari Nagar</option>
+                <option value="Rajaji Nagar">Rajaji Nagar</option>
+                <option value="Ramamurthy Nagar">Ramamurthy Nagar</option>
+                <option value="Sarjapur">Sarjapur</option>
+                <option value="Sarjapur  Road">Sarjapur  Road</option>
+                <option value="Thanisandra">Thanisandra</option>
+                <option value="Uttarahalli">Uttarahalli</option>
+                <option value="Whitefield">Whitefield</option>
+                <option value="Yelahanka">Yelahanka</option>
+                <option value="Yeshwanthpur">Yeshwanthpur</option>
+                <option value="other">Other / Not Listed</option>
+            </select>
+        </div>
+
+        <div class="field">
+          <label for="total_sqft">Total Area</label>
+          <div class="input-wrap">
+            <!-- UPDATED: match backend validation -->
+            <input type="number" id="total_sqft" value="1200" min="300" max="10000" step="50"/>
+            <span class="input-unit">sq.ft</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="BHK">BHK</label>
+          <!-- UPDATED: match backend validation -->
+          <input type="number" id="BHK" value="2" min="1" max="10"/>
+        </div>
+
+        <div class="field">
+          <label for="bath">Bathrooms</label>
+          <!-- UPDATED: match backend validation -->
+          <input type="number" id="bath" value="2" min="1" max="10"/>
+        </div>
+
+        <div class="field">
+          <label for="balcony">Balconies</label>
+          <!-- UPDATED: match backend validation -->
+          <input type="number" id="balcony" value="1" min="0" max="3"/>
+        </div>
+
+        <button class="btn" onclick="predict()">
+          Estimate Price
+        </button>
+
+      </div>
+
+      <!-- UPDATED RESULT HTML: Lakhs ≈ USD -->
+      <div class="result" id="result">
+        <div class="result-inner">
+          <div class="result-label">Estimated Market Value</div>
+
+          <div class="result-prices">
+            <div class="result-price" id="price-display">—</div>
+            <div class="result-price-divider">≈</div>
+            <div class="result-price result-price-usd" id="price-display-usd"></div>
+          </div>
+
+          <div class="result-sub" id="result-sub"></div>
+        </div>
+      </div>
+      <!-- END UPDATED RESULT HTML -->
+
+    </div>
+
+    <footer>
+      <div class="footer-chips">
+        <span class="chip">HistGradientBoosting Model</span>
+        <span class="chip">Bengaluru Housing Dataset</span>
+        <span class="chip">Deployed on <a href="#">AWS EC2</a></span>
+        <span class="chip">Model stored on S3</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const API_URL = "http://3.148.231.80:5000/predict";
+
+    async function predict() {
+      const btn = document.querySelector('.btn');
+      const resultBox = document.getElementById('result');
+      const priceDisplay = document.getElementById('price-display');
+      const priceDisplayUsd = document.getElementById('price-display-usd');
+      const resultSub = document.getElementById('result-sub');
+
+      const payload = {
+        area_type: document.getElementById('area_type').value,
+        location: document.getElementById('location').value,
+        total_sqft: parseFloat(document.getElementById('total_sqft').value),
+        BHK: parseFloat(document.getElementById('BHK').value),
+        bath: parseFloat(document.getElementById('bath').value),
+        balcony: parseFloat(document.getElementById('balcony').value),
+      };
+
+      // Show loading
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Estimating...';
+      resultBox.className = 'result';
+      resultBox.style.display = 'none';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          const price = data.predicted_price_lakhs;
+          const usd = (price * 1200).toLocaleString('en-US', { maximumFractionDigits: 0 });
+          const crore = price >= 100 ? ` (₹${(price / 100).toFixed(2)} Cr)` : '';
+
+          priceDisplay.innerHTML = `₹${price.toFixed(2)}<span class="result-unit">Lakhs</span>`;
+          priceDisplayUsd.innerHTML = `$${usd}<span class="result-unit">USD</span>`;
+
+          resultSub.innerHTML = `
+            <span class="result-tag">${payload.BHK} BHK</span>
+            <span class="result-tag">${payload.total_sqft} sq.ft</span>
+            <span class="result-tag">${payload.location}</span>
+            ${crore ? `<span class="result-tag">${crore}</span>` : ''}
+          `;
+
+          resultBox.className = 'result visible';
+        } else {
+          priceDisplay.innerHTML = '';
+          priceDisplayUsd.innerHTML = '';
+          resultSub.innerHTML = `<span class="result-error">${data.error || 'Prediction failed'}</span>`;
+          resultBox.className = 'result error visible';
+        }
+      } catch (err) {
+        priceDisplay.innerHTML = '';
+        priceDisplayUsd.innerHTML = '';
+        resultSub.innerHTML = `<span class="result-error">Could not reach the API. Make sure the server is running.</span>`;
+        resultBox.className = 'result error visible';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Estimate Price';
+        resultBox.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
