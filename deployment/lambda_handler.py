@@ -1,9 +1,12 @@
 import json, boto3, joblib, numpy as np, pandas as pd, os, uuid
+from datetime import datetime, timezone
+from decimal import Decimal
 
 MODEL_PATH = "/tmp/hgb_model.pkl"
 COLUMNS_PATH = "/tmp/model_columns.pkl"
 LOCATION_ENCODING_PATH = "/tmp/location_encoding.pkl"
 BUCKET = "real-estate-model-artifacts-rc"
+TABLE_NAME = "real-estate-predictions"
 
 def download_artifacts():
     if not os.path.exists(MODEL_PATH):
@@ -16,6 +19,10 @@ download_artifacts()
 model = joblib.load(MODEL_PATH)
 model_columns = joblib.load(COLUMNS_PATH)
 location_encoding = joblib.load(LOCATION_ENCODING_PATH)
+
+# DynamoDB resource — initialized once at cold start
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(TABLE_NAME)
 
 def lambda_handler(event, context):
     try:
@@ -42,11 +49,31 @@ def lambda_handler(event, context):
         input_aligned = input_encoded.reindex(columns=model_columns, fill_value=0)
 
         prediction = model.predict(input_aligned)[0]
+        request_id = str(uuid.uuid4())
+        predicted_price = round(float(prediction), 2)
+
+        # ── Log prediction to DynamoDB ────────────────────────────────────
+        table.put_item(Item={
+            "request_id":            request_id,
+            "timestamp":             datetime.now(timezone.utc).isoformat(),
+            "area_type":             body["area_type"],
+            "location":              location,
+            "total_sqft":            Decimal(str(body["total_sqft"])),
+            "bath":                  Decimal(str(body["bath"])),
+            "balcony":               Decimal(str(body["balcony"])),
+            "BHK":                   Decimal(str(body["BHK"])),
+            "predicted_price_lakhs": Decimal(str(predicted_price)),
+        })
+        # ─────────────────────────────────────────────────────────────────
 
         return {
             "statusCode": 200,
             "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
-            "body": json.dumps({"ok": True, "predicted_price_lakhs": round(float(prediction), 2), "request_id": str(uuid.uuid4())})
+            "body": json.dumps({
+                "ok": True,
+                "predicted_price_lakhs": predicted_price,
+                "request_id": request_id
+            })
         }
     except Exception as e:
         return {
