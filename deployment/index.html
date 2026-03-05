@@ -4,33 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bengaluru House Price Estimator</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f7f5f2;
+      --bg: #f4f6f9;
       --white: #ffffff;
-      --ink: #1a1714;
-      --ink-2: #3d3830;
-      --ink-3: #7a7168;
-      --ink-4: #b5afa6;
-      --border: #e4e0da;
-      --border-2: #cdc8c0;
-      --accent: #c8440a;
-      --accent-light: #fdf1ec;
-      --accent-mid: #f0d5c8;
-      --green: #1a6b3c;
-      --green-light: #edf5f0;
-      --shadow-sm: 0 1px 3px rgba(26,23,20,0.08), 0 1px 2px rgba(26,23,20,0.04);
-      --shadow-md: 0 4px 16px rgba(26,23,20,0.1), 0 2px 6px rgba(26,23,20,0.06);
-      --shadow-lg: 0 12px 40px rgba(26,23,20,0.14), 0 4px 12px rgba(26,23,20,0.08);
+      --ink: #0d1117;
+      --ink-2: #24292f;
+      --ink-3: #57606a;
+      --ink-4: #8c959f;
+      --border: #d0d7de;
+      --border-2: #b1bac4;
+      --accent: #0969da;
+      --accent-light: #ddf4ff;
+      --accent-mid: #b6d8fb;
+      --green: #1a7f37;
+      --green-light: #dafbe1;
+      --shadow-sm: 0 1px 3px rgba(13,17,23,0.08), 0 1px 2px rgba(13,17,23,0.04);
+      --shadow-md: 0 4px 16px rgba(13,17,23,0.1), 0 2px 6px rgba(13,17,23,0.06);
+      --shadow-lg: 0 8px 32px rgba(13,17,23,0.12), 0 2px 8px rgba(13,17,23,0.08);
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--ink);
       min-height: 100vh;
@@ -39,8 +39,8 @@
 
     /* ── NAV ── */
     nav {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
+      background: var(--ink);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       padding: 0 40px;
       height: 60px;
       display: flex;
@@ -49,7 +49,6 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: var(--shadow-sm);
     }
 
     .nav-logo {
@@ -63,11 +62,11 @@
       width: 32px;
       height: 32px;
       background: var(--accent);
-      border-radius: 8px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 18px;
       color: white;
       line-height: 1;
@@ -76,7 +75,7 @@
     .nav-logo-text {
       font-size: 15px;
       font-weight: 600;
-      color: var(--ink);
+      color: #ffffff;
       letter-spacing: -0.01em;
     }
 
@@ -85,19 +84,19 @@
       align-items: center;
       gap: 6px;
       padding: 5px 12px;
-      background: var(--green-light);
-      border: 1px solid rgba(26,107,60,0.2);
+      background: rgba(26,127,55,0.2);
+      border: 1px solid rgba(26,127,55,0.4);
       border-radius: 100px;
       font-size: 12px;
       font-weight: 500;
-      color: var(--green);
+      color: #3fb950;
     }
 
     .nav-badge-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--green);
+      background: #3fb950;
       animation: livepulse 2s ease infinite;
     }
 
@@ -124,9 +123,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent);
       margin-bottom: 20px;
@@ -134,15 +133,16 @@
 
     .eyebrow-line {
       width: 24px;
-      height: 1px;
+      height: 2px;
       background: var(--accent);
+      border-radius: 2px;
     }
 
     h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(36px, 4vw, 52px);
-      font-weight: 400;
-      line-height: 1.15;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(34px, 4vw, 50px);
+      font-weight: 600;
+      line-height: 1.18;
       letter-spacing: -0.02em;
       color: var(--ink);
       margin-bottom: 20px;
@@ -180,7 +180,7 @@
     }
 
     .stat-value {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 28px;
       color: var(--ink);
       line-height: 1;
@@ -216,23 +216,23 @@
     }
 
     .pill {
-      padding: 5px 12px;
+      padding: 4px 10px;
       background: var(--white);
-      border: 1px solid var(--border-2);
-      border-radius: 100px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       font-size: 12px;
       color: var(--ink-2);
-      font-weight: 400;
+      font-weight: 500;
     }
 
     /* ── RIGHT COLUMN — FORM CARD ── */
     .card {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 12px;
       box-shadow: var(--shadow-lg);
       overflow: hidden;
-      animation: cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+      animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
     }
 
     @keyframes cardIn {
@@ -241,9 +241,9 @@
     }
 
     .card-header {
-      padding: 28px 32px 24px;
+      padding: 24px 28px 20px;
       border-bottom: 1px solid var(--border);
-      background: var(--white);
+      background: #f6f8fa;
     }
 
     .card-header-top {
@@ -254,9 +254,9 @@
     }
 
     .card-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 20px;
-      font-weight: 400;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
       color: var(--ink);
     }
 
@@ -272,7 +272,7 @@
       font-weight: 300;
     }
 
-    .card-body { padding: 28px 32px; }
+    .card-body { padding: 24px 28px; }
 
     /* Form fields */
     .field-group {
@@ -304,11 +304,11 @@
 
     select, input[type="number"] {
       width: 100%;
-      padding: 11px 14px;
-      background: var(--bg);
-      border: 1px solid var(--border-2);
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
+      padding: 9px 12px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
       font-weight: 400;
       color: var(--ink);
@@ -318,10 +318,10 @@
     }
 
     select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a7168' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238c959f' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-color: var(--bg);
+      background-position: right 12px center;
+      background-color: var(--white);
       padding-right: 36px;
       cursor: pointer;
     }
@@ -332,7 +332,7 @@
       outline: none;
       border-color: var(--accent);
       background: var(--white);
-      box-shadow: 0 0 0 3px rgba(200,68,10,0.1);
+      box-shadow: 0 0 0 3px rgba(9,105,218,0.15);
     }
 
     select:hover, input[type="number"]:hover {
@@ -366,18 +366,18 @@
     /* Submit */
     .btn {
       width: 100%;
-      padding: 14px 24px;
+      padding: 10px 20px;
       background: var(--accent);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      font-weight: 500;
+      letter-spacing: 0.01em;
       cursor: pointer;
       transition: all 0.15s;
-      margin-top: 24px;
+      margin-top: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -385,8 +385,8 @@
     }
 
     .btn:hover {
-      background: #a8360a;
-      box-shadow: 0 4px 16px rgba(200,68,10,0.3);
+      background: #0860ca;
+      box-shadow: 0 4px 12px rgba(9,105,218,0.3);
       transform: translateY(-1px);
     }
 
@@ -468,9 +468,9 @@
     }
 
     .result-price-main {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(36px, 7vw, 48px);
-      font-weight: 400;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(34px, 7vw, 46px);
+      font-weight: 600;
       color: var(--ink);
       line-height: 1;
     }
@@ -479,7 +479,7 @@
       font-size: 14px;
       font-weight: 400;
       color: var(--ink-3);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     .result-price-sep {
@@ -489,8 +489,8 @@
     }
 
     .result-price-usd {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(24px, 4vw, 32px);
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 4vw, 30px);
       font-weight: 400;
       color: var(--ink-2);
       line-height: 1;
@@ -563,7 +563,7 @@
       .page { grid-template-columns: 1fr; gap: 40px; padding: 40px 20px 80px; }
       .left { position: static; }
       .stats { grid-template-columns: repeat(2, 1fr); }
-      .card-body, .card-header { padding: 24px 20px; }
+      .card-body, .card-header { padding: 20px 20px; }
       .page-footer { padding: 24px 20px 48px; flex-direction: column; align-items: flex-start; }
     }
 
@@ -631,8 +631,10 @@
           <span class="pill">S3</span>
           <span class="pill">DynamoDB</span>
           <span class="pill">CloudFront</span>
-          <span class="pill">Docker</span>
-          <span class="pill">GitHub Actions</span>
+          <span class="pill">Docker / ECR</span>
+          <span class="pill">VPC</span>
+          <span class="pill">GitHub Actions CI/CD</span>
+          <span class="pill">CloudWatch</span>
         </div>
       </div>
     </div>
@@ -772,8 +774,7 @@
     <div class="footer-left">© 2026 BengaluruEstimate · Built with AWS Serverless + scikit-learn</div>
     <div class="footer-right">
       <a class="footer-link" href="https://github.com/Rohoxoxo/real-estate-ml-aws" target="_blank">GitHub</a>
-      <a class="footer-link" href="#">Dataset</a>
-      <a class="footer-link" href="#">Model Info</a>
+
     </div>
   </div>
 
