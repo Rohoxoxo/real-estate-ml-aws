@@ -1,0 +1,45 @@
+name: Deploy Lambda
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'deployment/lambda_handler.py'
+      - 'deployment/Dockerfile'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::241706223312:role/github-actions-real-estate
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image to ECR
+        run: |
+          docker build --platform linux/amd64 \
+            -t 241706223312.dkr.ecr.us-east-1.amazonaws.com/real-estate-ml:latest \
+            deployment/
+          docker push 241706223312.dkr.ecr.us-east-1.amazonaws.com/real-estate-ml:latest
+
+      - name: Deploy new image to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name real-estate-predict \
+            --image-uri 241706223312.dkr.ecr.us-east-1.amazonaws.com/real-estate-ml:latest \
+            --region us-east-1
