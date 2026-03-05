@@ -14,6 +14,8 @@
 
 **→ [https://d1py9yte5490xy.cloudfront.net](https://d1py9yte5490xy.cloudfront.net)**
 
+![Live Site](preview.png)
+
 Enter a property's area type, location, square footage, BHK, bathrooms, and balconies — get an instant ML-powered price estimate in Indian Lakhs and USD.
 
 ---
