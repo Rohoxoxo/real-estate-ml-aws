@@ -20,6 +20,8 @@ Enter a property's area type, location, square footage, BHK, bathrooms, and balc
 
 ## 🏗️ Architecture
 
+![System Architecture](architecture.png)
+
 ```
 Browser
   │
